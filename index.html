@@ -494,7 +494,11 @@ function renderPeleMele(){
 
 function getOverride(i){ return dayOverrides[i] || {}; }
 
+let currentDayIndex = null;
+let returnDayIndex = null;
+
 function openDay(i){
+  currentDayIndex = i;
   const d = days[i];
   const ov = getOverride(i);
   const programme = ov.programme || d.programme;
@@ -539,11 +543,22 @@ function openDay(i){
   document.getElementById("modalOverlay").classList.add("open");
 }
 
-document.getElementById("modalClose").onclick = closeModal;
+document.getElementById("modalClose").onclick = closeModalUser;
 document.getElementById("modalOverlay").addEventListener("click", e=>{
-  if(e.target.id === "modalOverlay") closeModal();
+  if(e.target.id === "modalOverlay") closeModalUser();
 });
 function closeModal(){ document.getElementById("modalOverlay").classList.remove("open"); }
+function closeModalUser(){
+  if(returnDayIndex !== null){
+    const idx = returnDayIndex;
+    returnDayIndex = null;
+    closeModal();
+    showView('programme');
+    setTimeout(()=>openDay(idx), 150);
+  } else {
+    closeModal();
+  }
+}
 
 /* ---------------- rendu générique des blocs ---------------- */
 function renderBlocksHTML(blocks){
@@ -644,6 +659,7 @@ function applyLinks(text) {
 
 /* ---------------- Liens croisés programme → fiches ───────────── */
 function goToActivite(nom){
+  returnDayIndex = currentDayIndex;
   closeModal();
   showView('activite');
   setTimeout(()=>{
@@ -653,6 +669,7 @@ function goToActivite(nom){
   }, 150);
 }
 function goToInfo(nom){
+  returnDayIndex = currentDayIndex;
   closeModal();
   showView('infos');
   setTimeout(()=>{
